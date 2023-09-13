@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "332425723447",
+    "project_id": "resolute-assignment-5b70e",
+    "storage_bucket": "resolute-assignment-5b70e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:332425723447:android:ec38f10594ca14906709b2",
+        "android_client_info": {
+          "package_name": "com.example.resoluteassignment"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCnrOge9XQCzNzaP_pOWpg6zLTeTtBoMeM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
