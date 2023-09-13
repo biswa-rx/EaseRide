@@ -75,7 +75,7 @@ fun WelcomeScreen(
 
             CButton(text = "Continue with Phone Number",
                 onClick = {
-//                    navController.navigate("login")
+                    navController.navigate("phone_login")
                 }
             )
             Spacer(modifier = Modifier.height(25.dp))

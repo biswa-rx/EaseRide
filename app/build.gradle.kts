@@ -40,6 +40,7 @@ android {
     buildFeatures {
         compose = true
     }
+
     composeOptions {
         kotlinCompilerExtensionVersion = "1.4.3"
     }
@@ -49,7 +50,6 @@ android {
         }
     }
 }
-
 dependencies {
 
     implementation("androidx.core:core-ktx:1.9.0")
