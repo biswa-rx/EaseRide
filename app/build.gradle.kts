@@ -85,4 +85,6 @@ dependencies {
 
     // google maps utils
     implementation ("com.google.maps.android:android-maps-utils:3.4.0")
+
+    implementation ("com.google.accompanist:accompanist-permissions:0.33.1-alpha")
 }

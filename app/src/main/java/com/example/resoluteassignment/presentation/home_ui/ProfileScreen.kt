@@ -1,5 +1,6 @@
 package com.example.resoluteassignment.presentation.home_ui
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,9 +12,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -29,6 +32,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.resoluteassignment.presentation.authentication.UserData
+import com.example.resoluteassignment.presentation.map_screen.ExampleForegroundLocationTrackerScreen
+import com.example.resoluteassignment.presentation.map_screen.ForegroundLocationTracker
 import com.example.resoluteassignment.presentation.map_screen.LocationPermissionScreen
 import com.example.resoluteassignment.presentation.map_screen.MapScreen
 import com.example.resoluteassignment.utils.checkForPermission
@@ -86,7 +91,18 @@ fun ProfileScreen(
         Text(text = "MAP VIEW", fontSize = 20.sp)
         Spacer(modifier = Modifier.height(8.dp))
         Text(text = "NOTE:- If you did not set API key then go manifest file and set API key to make map visible",fontSize = 10.sp, fontStyle = FontStyle.Italic)
+
+
         if (hasLocationPermission) {
+
+            //For Location update
+            var userLatitude by remember { mutableDoubleStateOf(0.0) }
+            var userLongitude by remember { mutableDoubleStateOf(0.0) }
+            ExampleForegroundLocationTrackerScreen(latitudeAndLongitude = { latitude,longitude->
+                userLatitude = latitude
+                userLongitude = longitude
+            })
+            Text(text = "Latitude -> $userLatitude\nLongitude -> $userLongitude")
             MapScreen(context)
         } else {
             LocationPermissionScreen {
@@ -95,7 +111,5 @@ fun ProfileScreen(
         }
 
     }
-
-
 
 }
