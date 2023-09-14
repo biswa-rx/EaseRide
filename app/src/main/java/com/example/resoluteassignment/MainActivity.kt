@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -38,7 +39,9 @@ import com.example.resoluteassignment.presentation.authentication.components.OTP
 import com.example.resoluteassignment.presentation.authentication.components.PhoneLoginScreen
 import com.example.resoluteassignment.presentation.home_ui.HomeScreen
 import com.example.resoluteassignment.presentation.home_ui.ProfileScreen
+import com.example.resoluteassignment.presentation.map_screen.LocationPermissionScreen
 import com.example.resoluteassignment.ui.theme.ResoluteAssignmentTheme
+import com.example.resoluteassignment.utils.checkForPermission
 import com.google.android.gms.auth.api.identity.Identity
 import com.google.firebase.FirebaseException
 import com.google.firebase.FirebaseTooManyRequestsException
@@ -307,3 +310,88 @@ class MainActivity : ComponentActivity() {
 
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+//To get location live update we have to implement code
+
+/**
+ * if (permissions.all {
+ *     ContextCompat.checkSelfPermission(
+ *         context,
+ *         it
+ *     ) == PackageManager.PERMISSION_GRANTED
+ * }) {
+ *     // Get the location
+ *     startLocationUpdates()
+ * } else {
+ *       Lunch permission dialog
+ * }
+ */
+
+
+
+//To get the current location, use getFusedLocationProviderClient() from the location service.
+
+/**
+ * fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+ */
+
+
+
+
+//Also, create the callback for the location update. we need to attach the location callback with the request location update function.
+
+/**
+ * locationCallback = object : LocationCallback() {
+ *     override fun onLocationResult(p0: LocationResult) {
+ *         for (lo in p0.locations) {
+ *             // Update UI with location data
+ *             currentLocation = LocationDetails(lo.latitude, lo.longitude)
+ *         }
+ *     }
+ * }
+ */
+
+
+/**
+ * @SuppressLint("MissingPermission")
+ * private fun startLocationUpdates() {
+ *     locationCallback?.let {
+ *         val locationRequest = LocationRequest.create().apply {
+ *             interval = 10000
+ *             fastestInterval = 5000
+ *             priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+ *         }
+ *         fusedLocationClient?.requestLocationUpdates(
+ *             locationRequest,
+ *             it,
+ *             Looper.getMainLooper()
+ *         )
+ *     }
+ * }
+ */
+
+//Also we have to start and stop update in OnStart and OnStop
+
+
+/**
+ * override fun onResume() {
+ *     super.onResume()
+ *     startLocationUpdates()
+ * }
+ *
+ * override fun onPause() {
+ *     super.onPause()
+ *     locationCallback?.let { fusedLocationClient?.removeLocationUpdates(it) }
+ * }
+ */
