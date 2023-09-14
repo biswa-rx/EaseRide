@@ -266,11 +266,15 @@ class MainActivity : ComponentActivity() {
             if (e is FirebaseAuthInvalidCredentialsException) {
                 // Invalid request
                 Log.d("TAG", "onVerificationFailed: ${e.toString()}")
+                Toast.makeText(this@MainActivity,"Authentication Failed: ${e.toString()}",Toast.LENGTH_SHORT).show()
             } else if (e is FirebaseTooManyRequestsException) {
                 // The SMS quota for the project has been exceeded
                 Log.d("TAG", "onVerificationFailed: ${e.toString()}")
+                Toast.makeText(this@MainActivity,"Authentication Failed: ${e.toString()}",Toast.LENGTH_SHORT).show()
             }
             // Show a message and update the UI
+            navController.navigate("sign_in")
+            navController.popBackStack()
         }
 
         override fun onCodeSent(
