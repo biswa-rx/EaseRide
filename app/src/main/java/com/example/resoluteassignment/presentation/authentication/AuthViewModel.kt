@@ -16,6 +16,13 @@ class AuthViewModel: ViewModel() {
         ) }
     }
 
+    fun loadingScreen(isLoading: Boolean){
+        _state.update { it.copy(
+            isLoading = isLoading
+        )
+        }
+    }
+
 
 
     fun resetState() {

@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -46,6 +47,7 @@ import com.example.resoluteassignment.ui.theme.LightBlue
 fun OTPVerifyScreen(
     modifier: Modifier = Modifier,
     phoneNumber: String,
+    isLoading: Boolean,
     verifyButtonClicked: (String) -> Unit,
     resendOTPButtonClicked: () -> Unit
 ) {
@@ -123,6 +125,9 @@ fun OTPVerifyScreen(
 
         Spacer(modifier = Modifier.weight(1f))
 
+        if(isLoading) {
+            CircularProgressIndicator()
+        }
         Button(modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 15.dp),
@@ -134,7 +139,7 @@ fun OTPVerifyScreen(
                     verifyButtonClicked(otpNumber)
                 }
             }
-            ,enabled = phoneNumber.isNotEmpty(),
+            ,enabled = phoneNumber.isNotEmpty() and !isLoading,
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color.Black,
                 disabledContainerColor = Color.LightGray))

@@ -11,12 +11,16 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -95,6 +99,8 @@ class MainActivity : ComponentActivity() {
                                 }
                             )
 
+
+
                             LaunchedEffect(key1 = state.isSignInSuccessful) {
                                 if(state.isSignInSuccessful) {
                                     Toast.makeText(
@@ -122,6 +128,8 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         composable("profile") {
+                            val viewModel = viewModel<AuthViewModel>()
+                            viewModel.loadingScreen(false)
                             ProfileScreen(
                                 userData = googleAuthUiClient.getSignedInUser(),
                                 onSignOut = {
@@ -132,66 +140,86 @@ class MainActivity : ComponentActivity() {
                                             "Signed out",
                                             Toast.LENGTH_LONG
                                         ).show()
-
                                         navController.popBackStack()
+                                        navController.navigate("sign_in")
                                     }
                                 }
                             )
                         }
 
                         composable("home") {
+                            val viewModel = viewModel<AuthViewModel>()
+                            viewModel.loadingScreen(false)
                             HomeScreen(
                                 userData = googleAuthUiClient.getSignedInUser()
                             )
                         }
 
+
                         composable("phone_login") {
-                            PhoneLoginScreen(nextButtonClicked = { phoneNum ->
-                                phoneNumber = phoneNum.trim()
-                                if (phoneNumber.isNotEmpty()){
-                                    if (phoneNumber.length == 10){
-                                        phoneNumber = "+91$phoneNumber"
-                                        val options = PhoneAuthOptions.newBuilder(auth)
-                                            .setPhoneNumber(phoneNumber)       // Phone number to verify
-                                            .setTimeout(60L, TimeUnit.SECONDS) // Timeout and unit
-                                            .setActivity(this@MainActivity)   // Activity (for callback binding)
-                                            .setCallbacks(callbacks) // OnVerificationStateChangedCallbacks
-                                            .build()
-                                        PhoneAuthProvider.verifyPhoneNumber(options)
-
-                                    }else{
-                                        Toast.makeText(this@MainActivity,"Please Enter correct Number" , Toast.LENGTH_SHORT).show()
-                                    }
-                                }else{
-                                    Toast.makeText(this@MainActivity , "Please Enter Number" , Toast.LENGTH_SHORT).show()
-
-                                }
+                            val viewModel = viewModel<AuthViewModel>()
+                            val state by viewModel.state.collectAsStateWithLifecycle()
+                            PhoneLoginScreen(isLoading = state.isLoading,
+                                nextButtonClicked = { phoneNum ->
+                                verifyNumber(phoneNum)
+                                    viewModel.loadingScreen(true)
                             })
                         }
 
                         composable("otp_verify") {
-                            OTPVerifyScreen(resendOTPButtonClicked = {
+                            val viewModel = viewModel<AuthViewModel>()
+                            val state by viewModel.state.collectAsStateWithLifecycle()
+                            OTPVerifyScreen(
+                                phoneNumber = phoneNumber,
+                                isLoading = state.isLoading,
+                                resendOTPButtonClicked = {
                                 resendVerificationCode();
                             },
                                 verifyButtonClicked = { typedOTP->
-                                    if (typedOTP.isNotEmpty()) {
-                                        if (typedOTP.length == 6) {
-                                            val credential: PhoneAuthCredential = PhoneAuthProvider.getCredential(
-                                                OTP, typedOTP
-                                            )
-                                            signInWithPhoneAuthCredential(credential)
-                                        } else {
-                                            Toast.makeText(this@MainActivity, "Please Enter Correct OTP $typedOTP", Toast.LENGTH_SHORT).show()
-                                        }
-                                    } else {
-                                        Toast.makeText(this@MainActivity, "Please Enter OTP", Toast.LENGTH_SHORT).show()
-                                    }
-
-                            }, phoneNumber = phoneNumber)
+                                    verifyOTP(typedOTP)
+                                    viewModel.loadingScreen(true)
+                            },)
                         }
                     }
                 }
             }
+        }
+    }
+
+    private fun verifyNumber(phoneNum: String){
+        phoneNumber = phoneNum.trim()
+        if (phoneNumber.isNotEmpty()){
+            if (phoneNumber.length == 10){
+                phoneNumber = "+91$phoneNumber"
+                val options = PhoneAuthOptions.newBuilder(auth)
+                    .setPhoneNumber(phoneNumber)       // Phone number to verify
+                    .setTimeout(60L, TimeUnit.SECONDS) // Timeout and unit
+                    .setActivity(this@MainActivity)   // Activity (for callback binding)
+                    .setCallbacks(callbacks) // OnVerificationStateChangedCallbacks
+                    .build()
+                PhoneAuthProvider.verifyPhoneNumber(options)
+
+            }else{
+                Toast.makeText(this@MainActivity,"Please Enter correct Number" , Toast.LENGTH_SHORT).show()
+            }
+        }else{
+            Toast.makeText(this@MainActivity , "Please Enter Number" , Toast.LENGTH_SHORT).show()
+
+        }
+    }
+
+    private fun verifyOTP(typedOTP: String){
+        if (typedOTP.isNotEmpty()) {
+            if (typedOTP.length == 6) {
+                val credential: PhoneAuthCredential = PhoneAuthProvider.getCredential(
+                    OTP, typedOTP
+                )
+                signInWithPhoneAuthCredential(credential)
+            } else {
+                Toast.makeText(this@MainActivity, "Please Enter Correct OTP $typedOTP", Toast.LENGTH_SHORT).show()
+            }
+        } else {
+            Toast.makeText(this@MainActivity, "Please Enter OTP", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -201,10 +229,15 @@ class MainActivity : ComponentActivity() {
                 if (task.isSuccessful) {
                     // Sign in success, update UI with the signed-in user's information
                     Toast.makeText(this , "Authenticate Successfully" , Toast.LENGTH_SHORT).show()
-//                    navController.navigate("profile")
+                    navController.popBackStack()
+                    navController.popBackStack()
+                    navController.popBackStack()
+                    navController.navigate("profile")
                 } else {
                     // Sign in failed, display a message and update the UI
                     Log.d("TAG", "signInWithPhoneAuthCredential: ${task.exception.toString()}")
+                    Toast.makeText(this,"Authentication Failed",Toast.LENGTH_SHORT).show()
+
                     if (task.exception is FirebaseAuthInvalidCredentialsException) {
                         // The verification code entered was invalid
                     }

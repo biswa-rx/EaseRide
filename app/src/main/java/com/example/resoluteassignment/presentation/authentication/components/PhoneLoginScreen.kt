@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -41,6 +42,7 @@ import com.example.resoluteassignment.ui.theme.LightBlue
 @Composable
 fun PhoneLoginScreen(
     modifier: Modifier = Modifier,
+    isLoading: Boolean,
     nextButtonClicked: (String) -> Unit
 ) {
     Column(
@@ -124,24 +126,33 @@ fun PhoneLoginScreen(
 
         Spacer(modifier = Modifier.weight(1f))
 
-        Button(modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 15.dp),
-            onClick = {
-                      if(phoneNumber.length<10){
-                          errorMessage = "Invalid Phone Number"
-                          isError = true
-                      }else{
-                          nextButtonClicked(phoneNumber)
-                      }
-            }
-            ,enabled = phoneNumber.isNotEmpty(),
-            colors = ButtonDefaults.buttonColors(
-            containerColor = Color.Black,
-            disabledContainerColor = Color.LightGray))
-        {
-            Text(text = "Next", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.W400)
+        if(isLoading){
+            CircularProgressIndicator()
         }
+            Button(modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 15.dp),
+                onClick = {
+                    if (phoneNumber.length < 10) {
+                        errorMessage = "Invalid Phone Number"
+                        isError = true
+                    } else {
+                        nextButtonClicked(phoneNumber)
+                    }
+                }, enabled = phoneNumber.isNotEmpty() and !isLoading,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.Black,
+                    disabledContainerColor = Color.LightGray
+                ))
+            {
+                Text(
+                    text = "Next",
+                    color = Color.White,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.W400
+                )
+            }
+
 
         Spacer(modifier = Modifier.height(10.dp))
     }
